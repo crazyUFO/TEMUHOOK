@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         TEMU管理
-// @namespace    YoungYang
-// @version      0.6
-// @description  TEMU快速管理
-// @author       You
+// @name         TEMUHOOK
+// @namespace    SAN
+// @version      1.0
+// @description  TEMUHOOK 提交
+// @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
 
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.min.js
@@ -17,10 +17,6 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
-
-// @license      MIT
-// @downloadURL https://update.greasyfork.org/scripts/522251/TEMU%E7%AE%A1%E7%90%86.user.js
-// @updateURL https://update.greasyfork.org/scripts/522251/TEMU%E7%AE%A1%E7%90%86.meta.js
 // ==/UserScript==
 
 (function () {
