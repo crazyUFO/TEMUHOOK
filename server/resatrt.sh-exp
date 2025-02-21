@@ -7,6 +7,20 @@ cd /root/TEMUHOOK
 echo "激活虚拟环境..."
 source "venv/bin/activate"
 
+# 检查脚本是否已在运行
+RUNNING_PID=$(ps -ef | grep "[p]ython /root/TEMUHOOK/server/main.py" | awk '{print $2}')
+
+if [ -n "$RUNNING_PID" ]; then
+    echo "脚本已经在运行，进程 PID: $RUNNING_PID，正在杀死进程..."
+    # 杀死当前运行的脚本进程
+    kill -9 "$RUNNING_PID"
+    if [ $? -eq 0 ]; then
+        echo "脚本进程已被杀死，PID: $RUNNING_PID"
+    else
+        echo "无法杀死脚本进程: $RUNNING_PID"
+        exit 1
+    fi
+fi
 # 运行 Python 脚本（后台运行，不输出日志文件）
 echo "启动新的脚本进程..."
 
