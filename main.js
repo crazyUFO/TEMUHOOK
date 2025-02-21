@@ -228,10 +228,10 @@
           {
             Cookie: "",
             blockPopUps: false,
-            pageSize: 50,
+            pageSize: 100,
             pageNum: 1,
             autoPage: true,
-            waitSeconds: 5,
+            waitSeconds: 3,
             abandonPriceRule: [],
             activityPriceRule: [],
             activityFilerStrRule: [],
