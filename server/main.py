@@ -4,6 +4,7 @@ import os
 import time
 from dotenv import load_dotenv
 from waitress import serve
+import logging
 
 # 加载 .env 文件中的环境变量
 load_dotenv()
@@ -25,7 +26,7 @@ def login():
     user_ip = request.remote_addr
     data = request.get_json()
     username = data.get("username")
-    print(f"用户名 {username} ip {user_ip}正在请求登录...")
+    logging.warning(f"用户名 {username} ip {user_ip}正在请求登录...")
     if not username:
         return jsonify({"error": "username require"}), 400
     user = redis_client.get(username)
@@ -49,7 +50,7 @@ def protected():
     # 从请求头中获取用户名
     username = request.headers.get("X-Username")
     user_ip = request.remote_addr
-    print(f"用户名 {username} ip {user_ip}正在请求鉴权")
+    logging.warning(f"用户名 {username} ip {user_ip}正在请求鉴权")
     if not username:
         return jsonify({"error": "token require"}), 400
     user = redis_client.get(username)
@@ -72,5 +73,5 @@ def protected():
 
 if __name__ == "__main__":
     # 使用 waitress 运行应用，绑定到 8765 端口
-    print("Starting server on port 8765...")
+    logging.info("Starting server on port 8765...")
     serve(app, host="0.0.0.0", port=8765)
