@@ -39,7 +39,7 @@ def login():
             "message": "Login successful",
             "username": username,
             "ip": user_ip,
-            ttl: "无期限" if ttl == -1 else ttl,
+            "ttl": "无期限" if ttl == -1 else ttl,
         }
     ),200
 
