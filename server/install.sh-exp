@@ -1,7 +1,10 @@
 #!/bin/bash
 
 # 1. 安装 git 和 redis
+echo "开始安装 Redis..."
+source ./install-redis.sh
 
+echo "Redis 安装完成，继续执行其他任务..."
 # 更新系统包索引
 echo "更新系统包索引..."
 sudo apt update || { echo "更新系统包索引失败"; exit 1; }
