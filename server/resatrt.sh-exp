@@ -3,6 +3,13 @@
 # 切换到项目目录
 cd /root/TEMUHOOK
 
+# 激活虚拟环境
+echo "激活虚拟环境..."
+source "venv/bin/activate"
+
+# 运行 Python 脚本（后台运行，不输出日志文件）
+echo "启动新的脚本进程..."
+
 # 拉取最新代码
 echo "Pulling the latest code..."
 git pull origin main  # 假设你的主分支是 main
@@ -13,4 +20,8 @@ nohup python ./server/main.py > app.log 2>&1 &
 
 echo "Flask application started in the background."
 
-tail -f app.log
+# 退出虚拟环境
+deactivate
+echo "打印日志..."
+sleep 2
+tail -f logs/app.log
