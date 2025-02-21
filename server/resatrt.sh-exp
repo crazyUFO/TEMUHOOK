@@ -38,4 +38,4 @@ echo "Flask application started in the background."
 deactivate
 echo "打印日志..."
 sleep 2
-tail -f logs/app.log
+tail -f app.log
