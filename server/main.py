@@ -32,7 +32,7 @@ def login():
     user = redis_client.get(username)
     if not user:
         return jsonify({"error": "username not find"}), 400
-    ttl = redis_client.ttl(user)
+    ttl = int(redis_client.ttl(user))
 
     return jsonify(
         {
