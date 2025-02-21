@@ -18,7 +18,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
-// ==UserScript==
+// ==/UserScript==
 
 (function () {
   "use strict";

@@ -8,7 +8,7 @@ const outputFile = 'dist/main.min.js';
 const code = fs.readFileSync(inputFile, 'utf8');
 
 // 使用正则表达式匹配元数据块
-const metadataBlock = code.match(/\/\/ ==UserScript==[\s\S]*?\/\/ ==UserScript==/i);
+const metadataBlock = code.match(/\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==/i);
 
 if (!metadataBlock) {
   console.error('未找到元数据块');
@@ -16,7 +16,7 @@ if (!metadataBlock) {
 }
 
 // 移除元数据块后的代码
-const codeWithoutMetadata = code.replace(/\/\/ ==UserScript==[\s\S]*?\/\/ ==UserScript==/i, '');
+const codeWithoutMetadata = code.replace(/\/\/ ==UserScript==[\s\S]*?\/\/ ==\/UserScript==/i, '');
 
 // 使用 Terser 压缩剩余代码
 minify(codeWithoutMetadata, {
