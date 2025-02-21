@@ -8,7 +8,7 @@ echo "激活虚拟环境..."
 source "venv/bin/activate"
 
 # 检查脚本是否已在运行
-RUNNING_PID=$(ps -ef | grep "[p]ython /root/TEMUHOOK/server/main.py" | awk '{print $2}')
+RUNNING_PID=$(ps -ef | grep "[p]ython ./server/main.py" | awk '{print $2}')
 
 if [ -n "$RUNNING_PID" ]; then
     echo "脚本已经在运行，进程 PID: $RUNNING_PID，正在杀死进程..."
