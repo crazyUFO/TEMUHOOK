@@ -5,8 +5,7 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx terser main.js -o dist/main.min.js --mangle --comments /==UserScript==/i"
-
+    "build": "node build.js"
   },
   "author": "xiaosan",
   "license": "ISC",
