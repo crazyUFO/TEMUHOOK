@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# 切换到项目目录
+cd /root/TEMUHOOK
+
+# 拉取最新代码
+echo "Pulling the latest code..."
+git pull origin main  # 假设你的主分支是 main
+
+# 启动 Flask 应用
+echo "Starting the Flask application..."
+nohup waitress-serve --call 'app:app' > app.log 2>&1 &
+
+echo "Flask application started in the background."
+
+tail -f app.log
