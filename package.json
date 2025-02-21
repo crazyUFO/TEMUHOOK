@@ -1,0 +1,16 @@
+{
+  "name": "temuhook",
+  "version": "1.0.0",
+  "description": "temuhook tool",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx terser main.js -o dist/main.min.js --mangle"
+
+  },
+  "author": "xiaosan",
+  "license": "ISC",
+  "devDependencies": {
+    "terser": "^5.39.0"
+  }
+}
