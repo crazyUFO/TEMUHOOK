@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      1.1
+// @version      1.2
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
-
+// @homepageURL  https://www.baidu.com
+// @updateURL    https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
+// @downloadURL  https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.min.js
-
 // @require      data:application/javascript,unsafeWindow.Vue%3DVue%2Cthis.Vue%3DVue%3B
 // @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.full.min.js
 // @resource     ELEMENT_CSS https://unpkg.com/element-plus@2.3.12/dist/index.css
-
 // @grant        unsafeWindow
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
