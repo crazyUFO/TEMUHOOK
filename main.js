@@ -17,6 +17,7 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
 (function () {
@@ -55,12 +56,15 @@
         .is-blockPopUps [data-testid="beast-core-modal"]{
             display: none !important;
         }
+        .el-overlay.is-message-box {
+          z-index: 999999 !important; /* 例如 3000 */
+        }
     `);
 
   // HTML模板
   let appHtml = `
         <div id="vueApp">
-            <el-button type="info" @click="settingDrawer = true">面板</el-button>
+            <el-button type="info" @click="openPanl">TEMUHOOK</el-button>
 
             <el-drawer v-model="settingDrawer" title="设置面板" :with-header="false" >
 
@@ -235,6 +239,7 @@
             abandonPriceRule: [],
             activityPriceRule: [],
             activityFilerStrRule: [],
+            token: null,
           },
           GM_getValue("configSetting"),
           { Cookie: document.cookie }
@@ -262,6 +267,111 @@
       });
     },
     methods: {
+      /**
+       * 打开设置面板
+       */
+      openPanl: async function () {
+        let is_open = await this.checkToken();
+        if (is_open) {
+          this.settingDrawer = true;
+        }
+        //
+      },
+      /**
+       * 令牌输入框
+       * @param {string} value 令牌
+       * @returns {Promise}  resolve(value) or reject(null)
+       */
+      login() {
+        this.$prompt("输入令牌", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          customClass: "login-message-box",
+          inputPattern:
+           /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+          inputErrorMessage: "输入令牌格式不正确",
+        })
+          .then(({ value }) => {
+            let url = "http://182.254.136.122:8765/login";
+            GM_xmlhttpRequest({
+              url,
+              method: "POST", // 指定请求方法为POST
+              headers: {
+                "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+              },
+              data: JSON.stringify({ username: value }),
+              onload: (response) => {
+                if (response.status == 200) {
+                  this.configSetting.token = value;
+                  this.$message({
+                    type: "success",
+                    message: "你的令牌是: " + value,
+                  });
+                  this.settingDrawer = true;
+                } else {
+                  this.$message({
+                    type: "error",
+                    message: "没有此令牌",
+                  });
+                  setTimeout(()=>{
+                    this.login()
+                  },1000)
+                }
+              },
+
+              onerror: (error) => {
+                console.error("Error:", error);
+              },
+            }); // 解析JSON响应
+          })
+          .catch(() => {
+            this.$message({
+              type: "error",
+              message: "取消输入",
+            });
+          });
+      },
+
+      checkToken: async function () {
+        let url = "http://182.254.136.122:8765/protected";
+
+        // 返回一个新的 Promise
+        return new Promise((resolve, reject) => {
+          // 如果 token 不存在，直接调用 login 并返回 false
+          if (!this.configSetting.token) {
+            this.login();
+            resolve(false)
+            return
+          }
+          GM_xmlhttpRequest({
+            url,
+            method: "GET",
+            headers: {
+              "X-Username": this.configSetting.token,
+            },
+            onload: (response) => {
+              if (response.status === 200) {
+                // 请求成功，返回 true
+                resolve(true);
+              } else {
+                // 请求失败，清空 token 并返回 false
+                this.configSetting.token = null;
+                this.login()
+                this.$message({
+                  type: "error",
+                  message: "失效的令牌",
+                });
+                resolve(false);
+              }
+            },
+            onerror: (error) => {
+              // 请求出错，返回 false
+              console.error("Error:", error);
+              resolve(false);
+            },
+          });
+        });
+      },
       /**
        * 获取商品
        * @param {*}pageToken 下一页token
@@ -540,9 +650,9 @@
         _Vue.fetchState = true;
         _Vue.logList = [];
         let matchList = data;
-        let productList = []
+        let productList = [];
         if (filerSkustr.length) {
-          console.log(filerSkustr)
+          console.log(filerSkustr);
           _Vue.logList.push({
             text: `排除掉所有SKU属性集包含的...`,
           });
@@ -1159,7 +1269,12 @@
        * 点击执行类型
        * @param {*} state
        */
-      handleClick: function (state) {
+      handleClick:async function (state) {
+        let succ = await this.checkToken()
+        if(!succ){
+          this.settingDrawer = false
+          return
+        }
         if (state == "上新生命周期") {
           this.SMZQ_execute();
         }
