@@ -10,8 +10,8 @@
 // @downloadURL  https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
 // @require      https://cdn.jsdelivr.net/npm/vue@3.5.13/dist/vue.global.min.js
 // @require      data:application/javascript,unsafeWindow.Vue%3DVue%2Cthis.Vue%3DVue%3B
-// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.1/dist/index.full.min.js
-// @resource     ELEMENT_CSS https://unpkg.com/element-plus@2.3.12/dist/index.css
+// @require      https://cdn.jsdelivr.net/npm/element-plus@2.9.5/dist/index.full.min.js
+// @resource     ELEMENT_CSS https://cdn.jsdelivr.net/npm/element-plus@2.9.5/dist/index.min.css
 // @grant        unsafeWindow
 // @grant        GM_getResourceText
 // @grant        GM_addStyle
@@ -138,9 +138,7 @@
                             <div style="margin-top: 30px;">
                                 <el-button type="info" @click="HDSB_activityPirceAdd" :disabled="configSetting.activityPriceRule.length > 0">添加金额规则</el-button>
                             </div>
-                        </el-form>
-                        <el-divider>分割线</el-divider>
-                        <el-form :model="configSetting" label-width="auto">
+                        <el-divider>过滤字符</el-divider>
                             <el-table :data="configSetting.activityFilerStrRule" style="width: 100%">
                                 <el-table-column label="SKU属性集">
                                     <template #default="scope">
@@ -158,19 +156,26 @@
                             <div style="margin-top: 30px;">
                                 <el-button type="info" @click="HDSB_activityFilerStrAdd">添加字符匹配过滤</el-button>
                             </div>
+<!--                           <el-divider>选择活动</el-divider>
+                            <el-select v-model="selectedValue" placeholder="请选择">
+                              <el-option
+                                v-for="item in options"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                              </el-option>
+                            </el-select> -->
                         </el-form>
                     </el-tab-pane>
                 </el-tabs>
-
                 <div style="margin-top: 30px;" v-if="malInfoList.length">
                     <el-radio-group v-model="configSetting.mallId">
                         <el-radio v-for="item in malInfoList" :key="item.mallId" :value="item.mallId" :disabled="fetchState">{{item.mallName}}</el-radio>
                     </el-radio-group>
                 </div>
-
-                <div style="margin-top: 30px;">
+<!--                 <div style="margin-top: 30px;">
                     <el-button type="info" @click="dialogLogVisible = true">日志</el-button>
-                <div>
+                <div> -->
 
 
                 <div style="margin-top: 30px;" v-if="getUserInfoState && configSetting.mallId">
@@ -221,13 +226,19 @@
   let vueEl = document.createElement("div");
   vueEl.innerHTML = appHtml;
   document.body.append(vueEl);
-  console.log(GM_getValue("configSetting"));
   const App = {
     data() {
       return {
         settingDrawer: false,
         currentTab: "SMZQ",
         dialogLogVisible: false,
+        selectActivity: false,
+        selectedValue: "",
+        options: [
+          { value: "1", label: "选项1" },
+          { value: "2", label: "选项2" },
+          { value: "3", label: "选项3" },
+        ],
         configSetting: Object.assign(
           {
             Cookie: "",
@@ -248,6 +259,8 @@
         clickState: "",
         fetchState: false,
         malInfoList: [],
+        activityList: [],
+        currentActivity: 25022164983552,
         logList: [],
         logInfo: {
           index: 0,
@@ -259,6 +272,7 @@
     mounted() {
       this.$nextTick(() => {
         this.getUserInfo();
+        this.HDSB_getActivityList();
         const body = unsafeWindow.document.body;
         if (this.configSetting.blockPopUps) {
           body.classList.add("is-blockPopUps");
@@ -288,7 +302,7 @@
           cancelButtonText: "取消",
           customClass: "login-message-box",
           inputPattern:
-           /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
+            /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/,
           inputErrorMessage: "输入令牌格式不正确",
         })
           .then(({ value }) => {
@@ -313,9 +327,9 @@
                     type: "error",
                     message: "没有此令牌",
                   });
-                  setTimeout(()=>{
-                    this.login()
-                  },1000)
+                  setTimeout(() => {
+                    this.login();
+                  }, 1000);
                 }
               },
 
@@ -340,8 +354,8 @@
           // 如果 token 不存在，直接调用 login 并返回 false
           if (!this.configSetting.token) {
             this.login();
-            resolve(false)
-            return
+            resolve(false);
+            return;
           }
           GM_xmlhttpRequest({
             url,
@@ -356,7 +370,7 @@
               } else {
                 // 请求失败，清空 token 并返回 false
                 this.configSetting.token = null;
-                this.login()
+                this.login();
                 this.$message({
                   type: "error",
                   message: "失效的令牌",
@@ -433,6 +447,48 @@
         }).then((response) => response.json()); // 解析JSON响应
       },
       /**
+       * 获取活动列表
+       * @returns {Promise} Promise对象，resolve一个活动列表对象
+       */
+      HDSB_getActivityList: function () {
+        const configSetting = this.configSetting;
+        // 定义请求的URL
+        const url =
+          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/gambit/marketing/enroll/activity/list";
+        const data = {
+          needCanEnrollCnt: true,
+          needSessionItem: true,
+        };
+        // 使用fetch API发起POST请求
+        fetch(url, {
+          method: "POST", // 指定请求方法为POST
+          headers: {
+            "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+            Cookie: configSetting.Cookie, // 添加Cookie标头
+            mallid: configSetting.mallId, // 添加mallid标头
+          },
+          body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // console.log("HDSB_getActivityList: ", data);
+            // console.log("configSetting: ", configSetting);
+            if (data.success) {
+              let list = [];
+              data.result.activityList.forEach((val) => {
+                list = list.concat(val.thematicList);
+              });
+              this.activityList = list;
+              // console.log(this.activityList)
+            } else {
+              console.warn(`获取活动列表失败: ${data.errorMsg}`);
+            }
+          })
+          .catch((error) => {
+            console.error("获取活动列表失败: ", error); // 打印错误信息
+          }); // 解析JSON响应
+      },
+      /**
        * 等待时间
        * @param {*} seconds 秒
        * @returns
@@ -462,8 +518,8 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            console.log("getUserInfo: ", data);
-            console.log("configSetting: ", configSetting);
+            // console.log("getUserInfo: ", data);
+            // console.log("configSetting: ", configSetting);
             if (data.success) {
               this.malInfoList = data.result.companyList[0].malInfoList;
               this.getUserInfoState = true;
@@ -534,7 +590,7 @@
         const configSetting = this.configSetting;
         // 定义请求的URL
         const url =
-          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/xmen/select/searchForChainSupplier";
+          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/xmen/select/searchForSemiSupplier";
 
         pageSize =
           typeof pageSize == "undefined" ? configSetting.pageSize : pageSize;
@@ -1269,11 +1325,11 @@
        * 点击执行类型
        * @param {*} state
        */
-      handleClick:async function (state) {
-        let succ = await this.checkToken()
-        if(!succ){
-          this.settingDrawer = false
-          return
+      handleClick: async function (state) {
+        let succ = await this.checkToken();
+        if (!succ) {
+          this.settingDrawer = false;
+          return;
         }
         if (state == "上新生命周期") {
           this.SMZQ_execute();
