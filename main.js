@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      1.5
+// @version      1.6
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -721,7 +721,8 @@
         const price = configSetting.activityPriceRule[0].price;
         const maxPirce = configSetting.activityPriceRule[0].maxPirce;
         const filerSkustr = configSetting.activityFilerStrRule;
-        const targetActivityStock = configSetting.activityTargetActivityStock[0];
+        const targetActivityStock = configSetting.activityTargetActivityStock;
+        console.log(targetActivityStock);
         const _Vue = this;
         _Vue.fetchState = true;
         _Vue.logList = [];
@@ -776,8 +777,8 @@
           let productList_item = {
             productId: value.productId,
             activityStock:
-              (targetActivityStock
-                ? targetActivityStock
+              (targetActivityStock.length > 0
+                ? targetActivityStock[0]
                 : value.targetActivityStock) * 1,
             skcList: [],
             sessionIds: value.suggestEnrollSessionIdList,
