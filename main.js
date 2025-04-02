@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      1.4
+// @version      1.5
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -721,7 +721,7 @@
         const price = configSetting.activityPriceRule[0].price;
         const maxPirce = configSetting.activityPriceRule[0].maxPirce;
         const filerSkustr = configSetting.activityFilerStrRule;
-        const targetActivityStock = configSetting.activityTargetActivityStock;
+        const targetActivityStock = configSetting.activityTargetActivityStock[0];
         const _Vue = this;
         _Vue.fetchState = true;
         _Vue.logList = [];
