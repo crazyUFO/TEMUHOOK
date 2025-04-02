@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      1.3
+// @version      1.4
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -156,6 +156,24 @@
                             <div style="margin-top: 30px;">
                                 <el-button type="info" @click="HDSB_activityFilerStrAdd">添加字符匹配过滤</el-button>
                             </div>
+                        <el-divider>活动库存</el-divider>
+                            <el-table :data="configSetting.activityTargetActivityStock" style="width: 100%">
+                                <el-table-column label="库存数量">
+                                    <template #default="scope">
+                                        <el-input v-model="scope.row.str"  :disabled="fetchState" controls-position="right" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="" width="100">
+                                    <template #default="scope">
+                                        <el-button size="small" type="danger" @click="HDSB_activityTargetActivityStockDel(scope.$index, scope.row)" :disabled="fetchState">
+                                        Delete
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <div style="margin-top: 30px;">
+                                <el-button type="info" @click="HDSB_activityTargetActivityStockAdd" :disabled="configSetting.activityTargetActivityStock.length > 0">添加数量</el-button>
+                            </div>
 <!--                           <el-divider>选择活动</el-divider>
                             <el-select v-model="selectedValue" placeholder="请选择">
                               <el-option
@@ -250,6 +268,7 @@
             abandonPriceRule: [],
             activityPriceRule: [],
             activityFilerStrRule: [],
+            activityTargetActivityStock: [],
             token: null,
           },
           GM_getValue("configSetting"),
@@ -702,6 +721,7 @@
         const price = configSetting.activityPriceRule[0].price;
         const maxPirce = configSetting.activityPriceRule[0].maxPirce;
         const filerSkustr = configSetting.activityFilerStrRule;
+        const targetActivityStock = configSetting.activityTargetActivityStock;
         const _Vue = this;
         _Vue.fetchState = true;
         _Vue.logList = [];
@@ -755,7 +775,10 @@
         matchList.forEach((value) => {
           let productList_item = {
             productId: value.productId,
-            activityStock: value.targetActivityStock,
+            activityStock:
+              (targetActivityStock
+                ? targetActivityStock
+                : value.targetActivityStock) * 1,
             skcList: [],
             sessionIds: value.suggestEnrollSessionIdList,
           };
@@ -1291,10 +1314,26 @@
        * 活动申报-字符过滤
        * @description 添加一条字符过滤规则
        */
+      HDSB_activityTargetActivityStockAdd: function () {
+        this.configSetting.activityTargetActivityStock.push({
+          str: "",
+        });
+      },
+      /**
+       * 活动申报-活动数量
+       * @description 添加一条活动数量规则
+       */
       HDSB_activityFilerStrAdd: function () {
         this.configSetting.activityFilerStrRule.push({
           str: "",
         });
+      },
+      /**
+       * 活动申报-删除活动申报数量规则
+       * @param {Number} index - 在configSetting.activityFilerStrRule中的索引
+       */
+      HDSB_activityTargetActivityStockDel: function (index) {
+        this.configSetting.activityTargetActivityStock.splice(index, 1);
       },
       /**
        * 活动申报-删除字符串过滤规则
