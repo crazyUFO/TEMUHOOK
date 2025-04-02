@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      1.6
+// @version      1.7
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -160,7 +160,7 @@
                             <el-table :data="configSetting.activityTargetActivityStock" style="width: 100%">
                                 <el-table-column label="库存数量">
                                     <template #default="scope">
-                                        <el-input v-model="scope.row.str"  :disabled="fetchState" controls-position="right" />
+                                        <el-input v-model="scope.row.num"  :disabled="fetchState" controls-position="right" />
                                     </template>
                                 </el-table-column>
                                 <el-table-column label="" width="100">
@@ -778,7 +778,7 @@
             productId: value.productId,
             activityStock:
               (targetActivityStock.length > 0
-                ? targetActivityStock[0]
+                ? targetActivityStock[0].num
                 : value.targetActivityStock) * 1,
             skcList: [],
             sessionIds: value.suggestEnrollSessionIdList,
@@ -1311,18 +1311,19 @@
           maxPirce: 0,
         });
       },
-      /**
-       * 活动申报-字符过滤
-       * @description 添加一条字符过滤规则
+            /**
+       * 活动申报-活动数量
+       * @description 添加一条活动数量规则
        */
+
       HDSB_activityTargetActivityStockAdd: function () {
         this.configSetting.activityTargetActivityStock.push({
-          str: "",
+          num: "",
         });
       },
       /**
-       * 活动申报-活动数量
-       * @description 添加一条活动数量规则
+       * 活动申报-字符过滤
+       * @description 添加一条字符过滤规则
        */
       HDSB_activityFilerStrAdd: function () {
         this.configSetting.activityFilerStrRule.push({
