@@ -39,6 +39,9 @@
             display: flex;
             flex-direction: column-reverse;
         }
+        .el-tag + .el-tag {
+          margin-left: 10px;
+        }
         #vueApp .logBox{
             margin-bottom: 20px;
             max-height: 300px;
@@ -174,19 +177,17 @@
                             <div style="margin-top: 30px;">
                                 <el-button type="info" @click="HDSB_activityTargetActivityStockAdd" :disabled="configSetting.activityTargetActivityStock.length > 0">添加数量</el-button>
                             </div>
-<!--                           <el-divider>选择活动</el-divider>
-                            <el-select v-model="selectedValue" placeholder="请选择">
-                              <el-option
-                                v-for="item in options"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                              </el-option>
-                            </el-select> -->
+
                         </el-form>
                     </el-tab-pane>
                 </el-tabs>
+                <div style="margin-top: 30px;" v-if="siteList.length">
+                  <el-divider content-position="left">选择站点 <el-button type="text" :disabled="siteList.length == 0" @click="showSelectSite">更改</el-button></el-divider>
+                  <!--<template v-if="siteList.length"><el-tag size="small" v-for="val in configSetting.checkedSites" :key="val">{{siteLabel(val) }}</el-tag></template>-->
+                  <el-tag size="small" v-if="configSetting.checkedSites" >{{siteLabel(configSetting.checkedSites) }}</el-tag>
+                </div>
                 <div style="margin-top: 30px;" v-if="malInfoList.length">
+                <el-divider content-position="left">选择店铺</el-divider>
                     <el-radio-group v-model="configSetting.mallId">
                         <el-radio v-for="item in malInfoList" :key="item.mallId" :value="item.mallId" :disabled="fetchState">{{item.mallName}}</el-radio>
                     </el-radio-group>
@@ -239,6 +240,15 @@
                     </div>
                 </template>
             </el-dialog>
+
+            <el-dialog v-model="dialogSiteVisible" title="选择地区" destroy-on-close>
+              <!--<el-checkbox-group v-model="configSetting.checkedSites" >
+                  <el-checkbox v-for="val in siteList" :label="val.siteId" :key="val.siteId">{{val.siteName}}</el-checkbox>
+              </el-checkbox-group>-->
+                <el-radio-group v-model="configSetting.checkedSites" @change="dialogSiteVisible = false">
+                  <el-radio v-for="val in siteList" :label="val.siteId" :key="val.siteId">{{val.siteName}}</el-radio>
+              </el-radio-group>
+            </el-dialog>
         </div>
     `;
   let vueEl = document.createElement("div");
@@ -250,13 +260,9 @@
         settingDrawer: false,
         currentTab: "SMZQ",
         dialogLogVisible: false,
-        selectActivity: false,
-        selectedValue: "",
-        options: [
-          { value: "1", label: "选项1" },
-          { value: "2", label: "选项2" },
-          { value: "3", label: "选项3" },
-        ],
+        dialogSiteVisible: false,
+        selectedActivity: "",
+        siteList: [],
         configSetting: Object.assign(
           {
             Cookie: "",
@@ -270,6 +276,7 @@
             activityFilerStrRule: [],
             activityTargetActivityStock: [],
             token: null,
+            checkedSites:null,
           },
           GM_getValue("configSetting"),
           { Cookie: document.cookie }
@@ -291,6 +298,7 @@
     mounted() {
       this.$nextTick(() => {
         this.getUserInfo();
+        this.getSiteList();
         this.HDSB_getActivityList();
         const body = unsafeWindow.document.body;
         if (this.configSetting.blockPopUps) {
@@ -552,6 +560,48 @@
       },
 
       /**
+       * 获取站点列表
+       * @returns {Promise} Promise对象，resolve一个站点列表对象
+       */
+      getSiteList: function () {
+        const configSetting = this.configSetting;
+        // 定义请求的URL
+        const url =
+          "https://seller.kuajingmaihuo.com/bg-visage-mms/config/common/site/query";
+        // 定义要发送的数据
+        const data = {};
+        // 使用fetch API发起POST请求
+        fetch(url, {
+          method: "POST", // 指定请求方法为POST
+          headers: {
+            "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+            Cookie: configSetting.Cookie, // 添加Cookie标头
+            mallid: configSetting.mallId, // 添加mallid标头
+          },
+          body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              this.siteList = data.result.siteBaseList;
+            } else {
+              console.warn(`获取站点列表失败: ${data.errorMsg}`);
+            }
+          })
+          .catch((error) => {
+            console.error("获取站点列表失败: ", error); // 打印错误信息
+          }); // 解析JSON响应
+      },
+      /**
+       * 显示选择站点对话框
+       */
+      showSelectSite: function () {
+        this.dialogSiteVisible = true;
+      },
+      siteLabel(siteId){
+        return this.siteList.find(item => item.siteId == siteId).siteName
+      },
+      /**
        * 新生命周期-添加价格规则
        */
       SMZQ_abandonPriceRuleAdd: function () {
@@ -722,6 +772,7 @@
         const maxPirce = configSetting.activityPriceRule[0].maxPirce;
         const filerSkustr = configSetting.activityFilerStrRule;
         const targetActivityStock = configSetting.activityTargetActivityStock;
+        const siteId = configSetting.checkedSites
         console.log(targetActivityStock);
         const _Vue = this;
         _Vue.fetchState = true;
@@ -729,11 +780,9 @@
         let matchList = data;
         let productList = [];
         if (filerSkustr.length) {
-          console.log(filerSkustr);
           _Vue.logList.push({
             text: `排除掉所有SKU属性集包含的...`,
           });
-
           let filer_data = [];
           let skipCount = 0; // 统计跳过的 value 数量
           for (let i = 0; i < matchList.length; i++) {
@@ -772,6 +821,18 @@
             text: `统计：共${matchList.length} 条数据,通过SKU属性集排除了${skipCount}条数据`,
           });
           matchList = filer_data;
+        }
+        if (siteId){
+          _Vue.logList.push({
+            text: `筛选站点:${this.siteLabel(siteId)}的数据`,
+          });
+          let filer_data = matchList.filter((value) => {
+            return value.sites.some((v) => v.siteId == siteId);
+          })
+          matchList = filer_data
+          _Vue.logList.push({
+            text: `站点:${this.siteLabel(siteId)}的数据,共 ${matchList.length} 条数据`,
+          });
         }
         matchList.forEach((value) => {
           let productList_item = {
@@ -911,6 +972,7 @@
         const AbandonPriceSet = this.SMZQ_AbandonPriceSet;
         const reviewPrice = this.SMZQ_reviewNoBom;
         const revisePrice = this.SMZQ_bargainNoBom;
+        const siteId = this.configSetting.checkedSites;
 
         const _Vue = this;
         _Vue.fetchState = true;
@@ -998,6 +1060,12 @@
                   if (curStatus == 0) {
                     _Vue.logList.push({
                       text: `跳过: 价格申报中`,
+                    });
+                    continue;
+                  }
+                  if (siteId && !curSupplier.siteList.some((x) => x.siteId == siteId)) {
+                    _Vue.logList.push({
+                      text: `跳过: 不属于 ${this.siteLabel(siteId)} 站点`,
                     });
                     continue;
                   }
@@ -1417,7 +1485,7 @@
         // 开启深度监听
         deep: true,
       },
-    },
+    }
   };
   const app = Vue.createApp(App);
   app.use(ElementPlus);
