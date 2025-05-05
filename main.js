@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.0
+// @version      2.1
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -270,7 +270,7 @@
             pageSize: 100,
             pageNum: 1,
             autoPage: true,
-            waitSeconds: 7,
+            waitSeconds: 5,
             abandonPriceRule: [],
             activityPriceRule: [],
             activityFilerStrRule: [],
@@ -928,6 +928,10 @@
             });
             let productList = this.HDSB_match_procution_data(matchList);
             if (productList.length) {
+              _Vue.logList.push({
+                text: `等待${configSetting.waitSeconds}秒后提交`,
+              });
+              await waitSeconds(configSetting.waitSeconds);
               let result = await this.HDSB_submit(productList);
               if (result.success) {
                 _Vue.logList.push({
