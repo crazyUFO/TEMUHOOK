@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      1.9
+// @version      2.0
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -270,7 +270,7 @@
             pageSize: 100,
             pageNum: 1,
             autoPage: true,
-            waitSeconds: 5,
+            waitSeconds: 7,
             abandonPriceRule: [],
             activityPriceRule: [],
             activityFilerStrRule: [],
