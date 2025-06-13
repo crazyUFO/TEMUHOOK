@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.4
+// @version      2.5
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -1157,7 +1157,7 @@
         const configSetting = this.configSetting;
         const urlParams = new URLSearchParams(window.location.search);
         const url =
-          "https://agentseller.temu.com/api/kiana/gamblers/marketing/enroll/submit";
+          "https://agentseller.temu.com/api/kiana/gamblers/marketing/enroll/semi/submit";
         let type = urlParams.get("type");
         let thematicId = urlParams.get("thematicId");
         const data = {
