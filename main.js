@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.2
+// @version      2.3
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
-// @match        *://*.temu.com/*
+// @match        *://agentseller.temu.com/*
 // @homepageURL  https://www.baidu.com
 // @updateURL    https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
 // @downloadURL  https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
@@ -188,8 +188,8 @@
                   <el-tag size="small" v-if="configSetting.checkedSites" >{{siteLabel(configSetting.checkedSites) }}</el-tag>
                 </div>
                 <div style="margin-top: 30px;" v-if="malInfoList.length">
-                <el-divider content-position="left">选择店铺</el-divider>
-                    <el-radio-group v-model="configSetting.mallId">
+                <el-divider  content-position="left">选择店铺</el-divider> 
+                <el-radio-group v-model="configSetting.mallId">
                         <el-radio v-for="item in malInfoList" :key="item.mallId" :value="item.mallId" :disabled="fetchState">{{item.mallName}}</el-radio>
                     </el-radio-group>
                 </div>
@@ -254,6 +254,7 @@
     `;
   let vueEl = document.createElement("div");
   vueEl.innerHTML = appHtml;
+  console.log(document.cookie);
   document.body.append(vueEl);
   const App = {
     data() {
@@ -263,7 +264,708 @@
         dialogLogVisible: false,
         dialogSiteVisible: false,
         selectedActivity: "",
-        siteList: [],
+        siteList: [
+          {
+            siteId: 100,
+            siteName: "美国站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 101,
+            siteName: "加拿大站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 102,
+            siteName: "英国站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 103,
+            siteName: "澳大利亚站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 104,
+            siteName: "新西兰站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 105,
+            siteName: "德国站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 106,
+            siteName: "法国站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 107,
+            siteName: "意大利站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 108,
+            siteName: "荷兰站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 109,
+            siteName: "西班牙站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 110,
+            siteName: "墨西哥站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 111,
+            siteName: "葡萄牙站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 112,
+            siteName: "波兰站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 113,
+            siteName: "瑞典站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 114,
+            siteName: "瑞士站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 115,
+            siteName: "希腊",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 116,
+            siteName: "爱尔兰",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 117,
+            siteName: "塞浦路斯",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 118,
+            siteName: "日本站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 119,
+            siteName: "韩国站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 120,
+            siteName: "沙特站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 121,
+            siteName: "新加坡站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 122,
+            siteName: "阿联酋站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 123,
+            siteName: "科威特站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 124,
+            siteName: "挪威站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 125,
+            siteName: "智利站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 126,
+            siteName: "马来西亚站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 127,
+            siteName: "菲律宾站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 128,
+            siteName: "中国台湾站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 129,
+            siteName: "泰国站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 130,
+            siteName: "卡塔尔站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 131,
+            siteName: "约旦站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 132,
+            siteName: "巴西站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 133,
+            siteName: "阿曼站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 134,
+            siteName: "巴林站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 135,
+            siteName: "以色列站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 136,
+            siteName: "南非站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 141,
+            siteName: "保加利亚站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 137,
+            siteName: "捷克站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 138,
+            siteName: "匈牙利站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 139,
+            siteName: "丹麦站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 140,
+            siteName: "罗马尼亚站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 142,
+            siteName: "比利时站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 143,
+            siteName: "奥地利站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 144,
+            siteName: "芬兰站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 145,
+            siteName: "斯洛伐克站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 146,
+            siteName: "克罗地亚站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 147,
+            siteName: "斯洛文尼亚站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 148,
+            siteName: "立陶宛站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 149,
+            siteName: "爱沙尼亚站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 150,
+            siteName: "拉脱维亚站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 151,
+            siteName: "马耳他站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 152,
+            siteName: "卢森堡站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: true,
+          },
+          {
+            siteId: 153,
+            siteName: "塞尔维亚",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 154,
+            siteName: "摩尔多瓦",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 155,
+            siteName: "黑山",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 156,
+            siteName: "冰岛",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 157,
+            siteName: "安道尔",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 158,
+            siteName: "波黑",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 159,
+            siteName: "阿尔巴尼亚",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 160,
+            siteName: "北马其顿-已废弃",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 162,
+            siteName: "哈萨克斯坦",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 163,
+            siteName: "秘鲁",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 164,
+            siteName: "哥伦比亚",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 165,
+            siteName: "格鲁吉亚",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 166,
+            siteName: "亚美尼亚",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 167,
+            siteName: "阿塞拜疆",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 168,
+            siteName: "乌克兰",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 169,
+            siteName: "乌拉圭",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 161,
+            siteName: "科索沃",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 170,
+            siteName: "毛里求斯",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 171,
+            siteName: "摩洛哥",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 172,
+            siteName: "多米尼加",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 173,
+            siteName: "哥斯达黎加",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 174,
+            siteName: "土耳其",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 175,
+            siteName: "阿尔及利亚站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 176,
+            siteName: "巴拿马站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 177,
+            siteName: "肯尼亚站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 178,
+            siteName: "厄瓜多尔站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 179,
+            siteName: "特立尼达和多巴哥站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 180,
+            siteName: "危地马拉站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 181,
+            siteName: "乌兹别克斯坦站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 182,
+            siteName: "洪都拉斯站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 183,
+            siteName: "萨尔瓦多站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 184,
+            siteName: "巴基斯坦站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 185,
+            siteName: "斯里兰卡站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 186,
+            siteName: "蒙古站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 187,
+            siteName: "越南站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 188,
+            siteName: "文莱站",
+            dr: "us",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 189,
+            siteName: "阿根廷站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 190,
+            siteName: "尼日利亚站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 191,
+            siteName: "柬埔寨站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 192,
+            siteName: "北马其顿",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 193,
+            siteName: "孟加拉站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 194,
+            siteName: "吉尔吉斯斯坦站",
+            dr: "eu",
+            matchSemiManaged: true,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 196,
+            siteName: "马尔代夫站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 197,
+            siteName: "列支敦士登站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 198,
+            siteName: "加纳站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 199,
+            siteName: "埃及站",
+            dr: "eu",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+          {
+            siteId: 200,
+            siteName: "巴拉圭站",
+            dr: "us",
+            matchSemiManaged: false,
+            matchPreSemiHosting: false,
+          },
+        ],
         configSetting: Object.assign(
           {
             Cookie: "",
@@ -277,7 +979,7 @@
             activityFilerStrRule: [],
             activityTargetActivityStock: [],
             token: null,
-            checkedSites:null,
+            checkedSites: null,
           },
           GM_getValue("configSetting"),
           { Cookie: document.cookie }
@@ -297,8 +999,8 @@
       };
     },
     mounted() {
-      this.$nextTick(() => {
-        this.getUserInfo();
+      this.$nextTick(async () => {
+        await this.getUserInfo();
         this.getSiteList();
         this.HDSB_getActivityList();
         const body = unsafeWindow.document.body;
@@ -427,7 +1129,7 @@
         let thematicId = urlParams.get("thematicId");
         // 定义请求的URL
         const url =
-          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/gambit/marketing/enroll/scroll/match";
+          "https://agentseller.temu.com/api/kiana/gamblers/marketing/enroll/semi/scroll/match";
 
         // pageSize = typeof pageSize == "undefined" ? configSetting.pageSize : pageSize;
         // 定义要发送的数据
@@ -455,7 +1157,7 @@
         const configSetting = this.configSetting;
         const urlParams = new URLSearchParams(window.location.search);
         const url =
-          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/gambit/marketing/enroll/submit";
+          "https://agentseller.temu.com/api/kiana/gambit/marketing/enroll/submit";
         let type = urlParams.get("type");
         let thematicId = urlParams.get("thematicId");
         const data = {
@@ -524,13 +1226,24 @@
       waitSeconds: function (seconds) {
         return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
       },
-
-      /**
-       * 获取用户信息
-       */
       getUserInfo: function () {
+        switch (window.location.host) {
+          case "seller.kuajingmaihuo.com":
+            this.getUserInfo_seller_kuajingmaihuo_com();
+            break;
+          case "agentseller.temu.com":
+            this.getUserInfo_agentseller_temu_com();
+            break;
+          default:
+            this.getUserInfo_seller_kuajingmaihuo_com();
+            break;
+        }
+      },
+      /**
+       * 获取用户信息 seller.kuajingmaihuo.com
+       */
+      getUserInfo_seller_kuajingmaihuo_com: async function () {
         const configSetting = this.configSetting;
-        // 定义请求的URL
         const url =
           "https://seller.kuajingmaihuo.com/bg/quiet/api/mms/userInfo";
         // 定义要发送的数据
@@ -550,6 +1263,41 @@
             // console.log("configSetting: ", configSetting);
             if (data.success) {
               this.malInfoList = data.result.companyList[0].malInfoList;
+              this.configSetting.mallId = this.malInfoList[0].mallId;
+              this.getUserInfoState = true;
+            } else {
+              console.warn(`获取用户信息失败: ${data.errorMsg}`);
+            }
+          })
+          .catch((error) => {
+            console.error("获取用户信息失败: ", error); // 打印错误信息
+          }); // 解析JSON响应
+      },
+
+      /**
+       * 获取用户信息 seller.kuajingmaihuo.com
+       */
+      getUserInfo_agentseller_temu_com: async function () {
+        const configSetting = this.configSetting;
+        const url = "https://agentseller.temu.com/api/seller/auth/userInfo";
+        // 定义要发送的数据
+        const data = {};
+        // 使用fetch API发起POST请求
+        fetch(url, {
+          method: "POST", // 指定请求方法为POST
+          headers: {
+            "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+            Cookie: configSetting.Cookie, // 添加Cookie标头
+          },
+          body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // console.log("getUserInfo: ", data);
+            // console.log("configSetting: ", configSetting);
+            if (data.success) {
+              this.malInfoList = data.result.mallList;
+              this.configSetting.mallId = this.malInfoList[0].mallId;
               this.getUserInfoState = true;
             } else {
               console.warn(`获取用户信息失败: ${data.errorMsg}`);
@@ -599,8 +1347,8 @@
       showSelectSite: function () {
         this.dialogSiteVisible = true;
       },
-      siteLabel(siteId){
-        return this.siteList.find(item => item.siteId == siteId).siteName
+      siteLabel(siteId) {
+        return this.siteList.find((item) => item.siteId == siteId).siteName;
       },
       /**
        * 新生命周期-添加价格规则
@@ -773,7 +1521,7 @@
         const maxPirce = configSetting.activityPriceRule[0].maxPirce;
         const filerSkustr = configSetting.activityFilerStrRule;
         const targetActivityStock = configSetting.activityTargetActivityStock;
-        const siteId = configSetting.checkedSites
+        const siteId = configSetting.checkedSites;
         console.log(targetActivityStock);
         const _Vue = this;
         _Vue.fetchState = true;
@@ -784,127 +1532,168 @@
           _Vue.logList.push({
             text: `排除掉所有SKU属性集包含的...`,
           });
-          let filer_data = [];
-          let skipCount = 0; // 统计跳过的 value 数量
-          for (let i = 0; i < matchList.length; i++) {
-            let value = matchList[i];
-            let shouldSkipValue = false;
 
-            for (let j = 0; j < value.skcList.length; j++) {
-              let val = value.skcList[j];
+          let filteredList = [];
+          let skippedCount = 0;
 
-              for (let k = 0; k < val.skuList.length; k++) {
-                let v = val.skuList[k];
+          for (let item of matchList) {
+            const shouldSkip = item.activitySiteInfoList.some((site) =>
+              site.skcList.some((skc) =>
+                skc.skuList.some((sku) => {
+                  return Object.values(sku.properties).some((prop) => {
+                    if (this.HDSB_activityFilterSKU(prop)) {
+                      _Vue.logList.push({
+                        text: `排除：sku属性集${prop}中包含设置的字符`,
+                      });
+                      return true;
+                    }
+                    return false;
+                  });
+                })
+              )
+            );
 
-                for (let key in v) {
-                  if (this.HDSB_activityFilterSKU(v[key])) {
-                    _Vue.logList.push({
-                      text: `排除：sku属性集${v[key]}中包含设置的字符`,
-                    });
-                    shouldSkipValue = true;
-                    break; // 跳出 skuList 的遍历
-                  }
-                }
-
-                if (shouldSkipValue) break; // 跳出 skcList 的遍历
-              }
-
-              if (shouldSkipValue) break; // 跳出 value 的遍历
-            }
-
-            if (!shouldSkipValue) {
-              filer_data.push(value);
+            if (shouldSkip) {
+              skippedCount++;
             } else {
-              skipCount++; // 如果跳过了当前 value，递增计数器
+              filteredList.push(item);
             }
           }
+
           _Vue.logList.push({
-            text: `统计：共${matchList.length} 条数据,通过SKU属性集排除了${skipCount}条数据`,
+            text: `统计：共${matchList.length} 条数据, 通过SKU属性集排除了 ${skippedCount} 条数据`,
           });
-          matchList = filer_data;
+
+          matchList = filteredList;
         }
-        if (siteId){
+
+        if (siteId) {
           _Vue.logList.push({
             text: `筛选站点:${this.siteLabel(siteId)}的数据`,
           });
           let filer_data = matchList.filter((value) => {
             return value.sites.some((v) => v.siteId == siteId);
-          })
-          matchList = filer_data
+          });
+          matchList = filer_data;
           _Vue.logList.push({
-            text: `站点:${this.siteLabel(siteId)}的数据,共 ${matchList.length} 条数据`,
+            text: `站点:${this.siteLabel(siteId)}的数据,共 ${
+              matchList.length
+            } 条数据`,
           });
         }
-        matchList.forEach((value) => {
-          let productList_item = {
+        productList = matchList.map((value) => {
+          return {
             productId: value.productId,
             activityStock:
               (targetActivityStock.length > 0
                 ? targetActivityStock[0].num
                 : value.targetActivityStock) * 1,
-            skcList: [],
+            siteInfoList: value.activitySiteInfoList.map((val) => {
+              return {
+                siteId: val.siteId,
+                skcList: val.skcList.map((v) => {
+                  return {
+                    skcId: v.skcId,
+                    skuList: v.skuList.map((vv) => {
+                      return {
+                        skuId: vv.skuId
+                      }
+                    }),
+                    activityPrice:
+                      v.suggestActivityPrice > maxPirce
+                        ? maxPirce
+                        : v.suggestActivityPrice,
+                  };
+                }),
+              };
+            }),
             sessionIds: value.suggestEnrollSessionIdList,
           };
-          value.skcList.forEach((val) => {
-            let skcList = {
-              skcId: val.skcId,
-              skuList: [],
-            };
-            if (val.sitePriceList) {
-              //外层存在sitePriceList
-              skcList["siteActivityPriceList"] = (
-                val.sitePriceList ? val.sitePriceList : []
-              )
-                .filter((v) => v.suggestActivityPrice >= price)
-                .map((v) => {
-                  let activityPrice =
-                    v.suggestActivityPrice > maxPirce
-                      ? maxPirce
-                      : v.suggestActivityPrice;
-                  _Vue.logList.push({
-                    text: `${value.productId}---价格 ${v.suggestActivityPrice}=>${activityPrice}`,
-                  });
-                  return { activityPrice: activityPrice, siteId: v.siteId };
-                });
-              skcList["skuList"] = val.skuList.map((v) => ({
-                skuId: v.skuId,
-              }));
-              if (skcList.siteActivityPriceList.length) {
-                productList_item.skcList.push(skcList);
-              }
-            } else {
-              val.skuList.forEach((v) => {
-                let sku_item = {
-                  skuId: v.skuId,
-                  siteActivityPriceList: v.sitePriceList
-                    .filter((j) => j.suggestActivityPrice >= price)
-                    .map((j) => {
-                      let activityPrice =
-                        j.suggestActivityPrice > maxPirce
-                          ? maxPirce
-                          : j.suggestActivityPrice;
-                      _Vue.logList.push({
-                        text: `${value.productId}---价格 ${j.suggestActivityPrice}=>${activityPrice}`,
-                      });
-                      return {
-                        activityPrice: activityPrice,
-                        siteId: j.siteId,
-                      };
-                    }),
-                };
-                if (sku_item.siteActivityPriceList.length) {
-                  skcList.skuList.push(sku_item);
-                }
-              });
-              if (skcList.skuList.length) {
-                productList_item.skcList.push(skcList);
-              }
-            }
-          });
-          if (productList_item.skcList.length) {
-            productList.push(productList_item);
-          }
         });
+        // matchList.forEach((value) => {
+        //   let productList_item = {
+        //     productId: value.productId,
+        //     activityStock:
+        //       (targetActivityStock.length > 0
+        //         ? targetActivityStock[0].num
+        //         : value.targetActivityStock) * 1,
+        //     siteInfoList: [],
+        //     sessionIds: value.suggestEnrollSessionIdList,
+        //   };
+        //   value.activitySiteInfoList.forEach((val) => {
+        //     let siteInfoList = {
+        //         siteId: val.siteId,
+        //         skcList: [],
+        //     }
+        //     val.skcList.forEach((v) => {
+        //       let skcList = {
+        //         skcId: v.skcId,
+        //         skuList: v.skuList.map((vv)=>{skuId:vv.skuId}),
+        //         activityPrice:v.suggestActivityPrice > maxPirce ? maxPirce : v.suggestActivityPrice,
+        //       };
+
+        //     })
+        //   })
+        //   value.skcList.forEach((val) => {
+        //     let skcList = {
+        //       skcId: val.skcId,
+        //       skuList: [],
+        //     };
+        //     if (val.sitePriceList) {
+        //       //外层存在sitePriceList
+        //       skcList["siteActivityPriceList"] = (
+        //         val.sitePriceList ? val.sitePriceList : []
+        //       )
+        //         .filter((v) => v.suggestActivityPrice >= price)
+        //         .map((v) => {
+        //           let activityPrice =
+        //             v.suggestActivityPrice > maxPirce
+        //               ? maxPirce
+        //               : v.suggestActivityPrice;
+        //           _Vue.logList.push({
+        //             text: `${value.productId}---价格 ${v.suggestActivityPrice}=>${activityPrice}`,
+        //           });
+        //           return { activityPrice: activityPrice, siteId: v.siteId };
+        //         });
+        //       skcList["skuList"] = val.skuList.map((v) => ({
+        //         skuId: v.skuId,
+        //       }));
+        //       if (skcList.siteActivityPriceList.length) {
+        //         productList_item.skcList.push(skcList);
+        //       }
+        //     } else {
+        //       val.skuList.forEach((v) => {
+        //         let sku_item = {
+        //           skuId: v.skuId,
+        //           siteActivityPriceList: v.sitePriceList
+        //             .filter((j) => j.suggestActivityPrice >= price)
+        //             .map((j) => {
+        //               let activityPrice =
+        //                 j.suggestActivityPrice > maxPirce
+        //                   ? maxPirce
+        //                   : j.suggestActivityPrice;
+        //               _Vue.logList.push({
+        //                 text: `${value.productId}---价格 ${j.suggestActivityPrice}=>${activityPrice}`,
+        //               });
+        //               return {
+        //                 activityPrice: activityPrice,
+        //                 siteId: j.siteId,
+        //               };
+        //             }),
+        //         };
+        //         if (sku_item.siteActivityPriceList.length) {
+        //           skcList.skuList.push(sku_item);
+        //         }
+        //       });
+        //       if (skcList.skuList.length) {
+        //         productList_item.skcList.push(skcList);
+        //       }
+        //     }
+        //   });
+        //   if (productList_item.skcList.length) {
+        //     productList.push(productList_item);
+        //   }
+        // });
         return productList;
       },
       /**
@@ -927,7 +1716,9 @@
             _Vue.logList.push({
               text: `服务器返回数据成功, 共${matchList.length}条数据`,
             });
+            console.log(res);
             let productList = this.HDSB_match_procution_data(matchList);
+            console.log(productList);
             if (productList.length) {
               _Vue.logList.push({
                 text: `等待${configSetting.waitSeconds}秒后提交`,
@@ -1068,7 +1859,10 @@
                     });
                     continue;
                   }
-                  if (siteId && !curSupplier.siteList.some((x) => x.siteId == siteId)) {
+                  if (
+                    siteId &&
+                    !curSupplier.siteList.some((x) => x.siteId == siteId)
+                  ) {
                     _Vue.logList.push({
                       text: `跳过: 不属于 ${this.siteLabel(siteId)} 站点`,
                     });
@@ -1384,7 +2178,7 @@
           maxPirce: 0,
         });
       },
-            /**
+      /**
        * 活动申报-活动数量
        * @description 添加一条活动数量规则
        */
@@ -1490,7 +2284,7 @@
         // 开启深度监听
         deep: true,
       },
-    }
+    },
   };
   const app = Vue.createApp(App);
   app.use(ElementPlus);
