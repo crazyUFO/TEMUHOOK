@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.5
+// @version      2.6
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -1591,20 +1591,28 @@
             siteInfoList: value.activitySiteInfoList.map((val) => {
               return {
                 siteId: val.siteId,
-                skcList: val.skcList.map((v) => {
-                  return {
-                    skcId: v.skcId,
-                    skuList: v.skuList.map((vv) => {
-                      return {
-                        skuId: vv.skuId
-                      }
-                    }),
-                    activityPrice:
+                skcList: val.skcList
+                  .filter((v) => {
+                   return v.suggestActivityPrice >= price
+                  })
+                  .map((v) => {
+                    let activityPrice =
                       v.suggestActivityPrice > maxPirce
                         ? maxPirce
-                        : v.suggestActivityPrice,
-                  };
-                }),
+                        : v.suggestActivityPrice;
+                    _Vue.logList.push({
+                      text: `${value.productId}---价格 ${v.suggestActivityPrice}=>${activityPrice}`,
+                    });
+                    return {
+                      skcId: v.skcId,
+                      skuList: v.skuList.map((vv) => {
+                        return {
+                          skuId: vv.skuId,
+                        };
+                      }),
+                      activityPrice: activityPrice,
+                    };
+                  }),
               };
             }),
             sessionIds: value.suggestEnrollSessionIdList,
@@ -1716,9 +1724,8 @@
             _Vue.logList.push({
               text: `服务器返回数据成功, 共${matchList.length}条数据`,
             });
-            console.log(res);
             let productList = this.HDSB_match_procution_data(matchList);
-            console.log(productList);
+            // console.log(productList);
             if (productList.length) {
               _Vue.logList.push({
                 text: `等待${configSetting.waitSeconds}秒后提交`,
