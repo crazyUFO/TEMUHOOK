@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.6
+// @version      2.8
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -1614,10 +1614,10 @@
                     };
                   }),
               };
-            }),
+            }).filter((val) => val.skcList.length > 0),
             sessionIds: value.suggestEnrollSessionIdList,
           };
-        });
+        }).filter((val) => val.siteInfoList.length > 0);
         // matchList.forEach((value) => {
         //   let productList_item = {
         //     productId: value.productId,
@@ -1725,7 +1725,6 @@
               text: `服务器返回数据成功, 共${matchList.length}条数据`,
             });
             let productList = this.HDSB_match_procution_data(matchList);
-            // console.log(productList);
             if (productList.length) {
               _Vue.logList.push({
                 text: `等待${configSetting.waitSeconds}秒后提交`,
