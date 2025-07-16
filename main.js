@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.8
+// @version      2.9
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -1036,7 +1036,7 @@
           inputErrorMessage: "输入令牌格式不正确",
         })
           .then(({ value }) => {
-            let url = "http://182.254.136.122:8765/login";
+            let url = "http://81.69.13.209:8765/login";
             GM_xmlhttpRequest({
               url,
               method: "POST", // 指定请求方法为POST
@@ -1077,7 +1077,7 @@
       },
 
       checkToken: async function () {
-        let url = "http://182.254.136.122:8765/protected";
+        let url = "http://81.69.13.209:8765/protected";
 
         // 返回一个新的 Promise
         return new Promise((resolve, reject) => {

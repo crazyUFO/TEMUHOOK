@@ -20,7 +20,7 @@ echo "拉取 Git 仓库..."
 git clone git@github.com:crazyUFO/TEMUHOOK.git || { echo "克隆 Git 仓库失败"; exit 1; }
 
 # 进入项目目录
-cd EMUHOOK || { echo "进入项目目录失败"; exit 1; }
+cd TEMUHOOK || { echo "进入项目目录失败"; exit 1; }
 
 # 3. 安装 Python 和必要工具
 
