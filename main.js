@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      2.9
+// @version      3.0
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -1045,6 +1045,7 @@
               },
               data: JSON.stringify({ username: value }),
               onload: (response) => {
+                console.log(response);
                 if (response.status == 200) {
                   this.configSetting.token = value;
                   this.$message({
@@ -1407,8 +1408,10 @@
       SMZQ_searchForChainSupplier: function (pageNum, pageSize) {
         const configSetting = this.configSetting;
         // 定义请求的URL
+        // const url =
+        //   "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/xmen/select/searchForSemiSupplier";
         const url =
-          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/xmen/select/searchForSemiSupplier";
+          "https://agentseller.temu.com/api/kiana/mms/robin/searchForSemiSupplier";
 
         pageSize =
           typeof pageSize == "undefined" ? configSetting.pageSize : pageSize;
@@ -1440,8 +1443,10 @@
       SMZQ_rejectRemark: function (orderIds) {
         const configSetting = this.configSetting;
         // 定义请求的URL
+        // const url =
+        //   "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/magnus/price/bargain-no-bom/batch/info/query";
         const url =
-          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/magnus/price/bargain-no-bom/batch/info/query";
+          "https://agentseller.temu.com/api/kiana/magnus/mms/price/bargain-no-bom/batch/info/query";
         // 定义要发送的数据
         const data = {
           orderIds: orderIds,
@@ -1497,8 +1502,10 @@
       SMZQ_bargainNoBom: function (postData) {
         const configSetting = this.configSetting;
         // 定义请求的URL
+        // const url =
+        //   "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/magnus/price/bargain-no-bom/batch";
         const url =
-          "https://seller.kuajingmaihuo.com/marvel-mms/cn/api/kiana/magnus/price/bargain-no-bom/batch";
+          "https://agentseller.temu.com/api/kiana/magnus/mms/price/bargain-no-bom/batch";
 
         // 使用fetch API发起POST请求
         return fetch(url, {
