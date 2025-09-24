@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      3.0
+// @version      3.1
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -144,7 +144,7 @@
                             </div>
                         <el-divider>过滤字符</el-divider>
                             <el-table :data="configSetting.activityFilerStrRule" style="width: 100%">
-                                <el-table-column label="SKU属性集">
+                                <el-table-column label="SKU/SKC属性集">
                                     <template #default="scope">
                                         <el-input v-model="scope.row.str"  :disabled="fetchState" controls-position="right" />
                                     </template>
@@ -159,6 +159,24 @@
                             </el-table>
                             <div style="margin-top: 30px;">
                                 <el-button type="info" @click="HDSB_activityFilerStrAdd">添加字符匹配过滤</el-button>
+                            </div>
+                          <el-divider>筛选字符</el-divider>
+                            <el-table :data="configSetting.activitySelectStrRule" style="width: 100%">
+                                <el-table-column label="SKU/SKC属性集">
+                                    <template #default="scope">
+                                        <el-input v-model="scope.row.str"  :disabled="fetchState" controls-position="right" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="" width="100">
+                                    <template #default="scope">
+                                        <el-button size="small" type="danger" @click="HDSB_activitySelectStrDel(scope.$index, scope.row)" :disabled="fetchState">
+                                        Delete
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <div style="margin-top: 30px;">
+                                <el-button type="info" @click="HDSB_activitySelectStrAdd">添加字符匹配筛选</el-button>
                             </div>
                         <el-divider>活动库存</el-divider>
                             <el-table :data="configSetting.activityTargetActivityStock" style="width: 100%">
@@ -977,6 +995,7 @@
             abandonPriceRule: [],
             activityPriceRule: [],
             activityFilerStrRule: [],
+            activitySelectStrRule: [],
             activityTargetActivityStock: [],
             token: null,
             checkedSites: null,
@@ -1493,7 +1512,7 @@
        * @param {*} dataList
        * @returns
        */
-      SMZQ_combineData: function (dataList) {},
+      SMZQ_combineData: function (dataList) { },
       /**
        * 新生命周期-批量的讨价还价
        * @param {*} postData
@@ -1527,6 +1546,7 @@
         const price = configSetting.activityPriceRule[0].price;
         const maxPirce = configSetting.activityPriceRule[0].maxPirce;
         const filerSkustr = configSetting.activityFilerStrRule;
+        const selectSkustr = configSetting.activitySelectStrRule;
         const targetActivityStock = configSetting.activityTargetActivityStock;
         const siteId = configSetting.checkedSites;
         console.log(targetActivityStock);
@@ -1537,7 +1557,7 @@
         let productList = [];
         if (filerSkustr.length) {
           _Vue.logList.push({
-            text: `排除掉所有SKU属性集包含的...`,
+            text: `排除掉所有SKU/SKC属性集包含的...`,
           });
 
           let filteredList = [];
@@ -1545,18 +1565,28 @@
 
           for (let item of matchList) {
             const shouldSkip = item.activitySiteInfoList.some((site) =>
-              site.skcList.some((skc) =>
-                skc.skuList.some((sku) => {
-                  return Object.values(sku.properties).some((prop) => {
-                    if (this.HDSB_activityFilterSKU(prop)) {
-                      _Vue.logList.push({
-                        text: `排除：sku属性集${prop}中包含设置的字符`,
-                      });
-                      return true;
-                    }
-                    return false;
+              site.skcList.some((skc) => {
+                if (this.HDSB_activityFilter(skc.extCode)) {
+                  _Vue.logList.push({
+                    text: `排除：skc属性集 ${skc.extCode} 中包含设置的字符`,
                   });
-                })
+                  return true
+                } else {
+                  return skc.skuList.some((sku) => {
+                    return Object.values(sku.properties).some((prop) => {
+                      if (this.HDSB_activityFilter(prop)) {
+                        _Vue.logList.push({
+                          text: `排除：sku属性集 ${prop} 中包含设置的字符`,
+                        });
+                        return true;
+                      }
+                      return false;
+                    });
+                  })
+
+                }
+              }
+
               )
             );
 
@@ -1568,12 +1598,58 @@
           }
 
           _Vue.logList.push({
-            text: `统计：共${matchList.length} 条数据, 通过SKU属性集排除了 ${skippedCount} 条数据`,
+            text: `统计：共${matchList.length} 条数据, 通过SKU/SKC属性集排除了 ${skippedCount} 条数据`,
           });
 
           matchList = filteredList;
         }
+        if (selectSkustr.length) {
+          _Vue.logList.push({
+            text: `筛选出所有SKU/SKC属性集包含的...`,
+          });
 
+          let selectedList = [];
+          let selectedCount = 0;
+
+          for (let item of matchList) {
+            const shouldAdd = item.activitySiteInfoList.some((site) =>
+              site.skcList.some((skc) => {
+                if (this.HDSB_activitySelect(skc.extCode)) {
+                  _Vue.logList.push({
+                    text: `筛选：skc属性集 ${skc.extCode} 中包含设置的字符`,
+                  });
+                  return true
+                } else {
+                  return skc.skuList.some((sku) => {
+                    return Object.values(sku.properties).some((prop) => {
+                      if (this.HDSB_activitySelect(prop)) {
+                        _Vue.logList.push({
+                          text: `筛选：sku属性集 ${prop} 中包含设置的字符`,
+                        });
+                        return true;
+                      }
+                      return false;
+                    });
+                  })
+
+                }
+              }
+
+              )
+            );
+
+            if (shouldAdd) {
+              selectedCount++;
+              selectedList.push(item);
+            }
+          }
+
+          _Vue.logList.push({
+            text: `统计：共${matchList.length} 条数据, 通过SKU/SKC属性集筛选出了 ${selectedCount} 条数据`,
+          });
+
+          matchList = selectedList;
+        }
         if (siteId) {
           _Vue.logList.push({
             text: `筛选站点:${this.siteLabel(siteId)}的数据`,
@@ -1583,9 +1659,8 @@
           });
           matchList = filer_data;
           _Vue.logList.push({
-            text: `站点:${this.siteLabel(siteId)}的数据,共 ${
-              matchList.length
-            } 条数据`,
+            text: `站点:${this.siteLabel(siteId)}的数据,共 ${matchList.length
+              } 条数据`,
           });
         }
         productList = matchList.map((value) => {
@@ -1600,7 +1675,7 @@
                 siteId: val.siteId,
                 skcList: val.skcList
                   .filter((v) => {
-                   return v.suggestActivityPrice >= price
+                    return v.suggestActivityPrice >= price
                   })
                   .map((v) => {
                     let activityPrice =
@@ -1888,9 +1963,8 @@
             let priceOrderIdsArr = this.sliceArrayInChunks(priceOrderIds, 700);
             for (let [key, value] of priceOrderIdsArr.entries()) {
               _Vue.logList.push({
-                text: `等待${configSetting.waitSeconds}秒请求第${
-                  key + 1
-                }片: 价格推荐信息=>700条一片`,
+                text: `等待${configSetting.waitSeconds}秒请求第${key + 1
+                  }片: 价格推荐信息=>700条一片`,
               });
 
               await waitSeconds(configSetting.waitSeconds);
@@ -1928,20 +2002,20 @@
               let supplierResult = AbandonPriceRule(val.suggestSupplyPrice);
               return supplierResult == 3
                 ? {
-                    priceOrderId: val.id,
-                    supplierResult: supplierResult, //使用这个进行对比 1 是使用推荐价格 2是自定义价格 3是放弃
-                    items: val.skuInfoList.map((item) => ({
-                      productSkuId: item.productSkuId,
-                    })),
-                  }
+                  priceOrderId: val.id,
+                  supplierResult: supplierResult, //使用这个进行对比 1 是使用推荐价格 2是自定义价格 3是放弃
+                  items: val.skuInfoList.map((item) => ({
+                    productSkuId: item.productSkuId,
+                  })),
+                }
                 : {
-                    priceOrderId: val.id,
-                    supplierResult: supplierResult, //使用这个进行对比 1 是使用推荐价格 2是自定义价格 3是放弃
-                    items: val.skuInfoList.map((item) => ({
-                      productSkuId: item.productSkuId,
-                      price: AbandonPriceSet(item.suggestSupplyPrice),
-                    })),
-                  };
+                  priceOrderId: val.id,
+                  supplierResult: supplierResult, //使用这个进行对比 1 是使用推荐价格 2是自定义价格 3是放弃
+                  items: val.skuInfoList.map((item) => ({
+                    productSkuId: item.productSkuId,
+                    price: AbandonPriceSet(item.suggestSupplyPrice),
+                  })),
+                };
             });
             _Vue.logList.push({
               text: `数据组合完毕: 共${itemRequests.length}条数据`,
@@ -1949,9 +2023,8 @@
             let postDatas = this.sliceArrayInChunks(itemRequests, 200);
             for (let [key, value] of postDatas.entries()) {
               _Vue.logList.push({
-                text: `等待${configSetting.waitSeconds}秒请求第${
-                  key + 1
-                }片: 数据提交=>200条一片`,
+                text: `等待${configSetting.waitSeconds}秒请求第${key + 1
+                  }片: 数据提交=>200条一片`,
               });
 
               await waitSeconds(configSetting.waitSeconds);
@@ -2135,9 +2208,8 @@
               for (let index = 0; index < postGroup.length; index++) {
                 const curPostData = postGroup[index];
                 _Vue.logList.push({
-                  text: `等待${configSetting.waitSeconds}秒请求: 第${
-                    index + 1
-                  }次签署,签署${curPostData.length}个`,
+                  text: `等待${configSetting.waitSeconds}秒请求: 第${index + 1
+                    }次签署,签署${curPostData.length}个`,
                 });
                 await waitSeconds(configSetting.waitSeconds);
                 await signJIT(curPostData)
@@ -2211,6 +2283,15 @@
         });
       },
       /**
+       * 活动申报-字符筛选
+       * @description 添加一条字符筛选规则
+       */
+      HDSB_activitySelectStrAdd: function () {
+        this.configSetting.activitySelectStrRule.push({
+          str: "",
+        });
+      },
+      /**
        * 活动申报-删除活动申报数量规则
        * @param {Number} index - 在configSetting.activityFilerStrRule中的索引
        */
@@ -2225,6 +2306,13 @@
         this.configSetting.activityFilerStrRule.splice(index, 1);
       },
       /**
+       * 活动申报-删除字符串筛选规则
+       * @param {Number} index - 在configSetting.activityFilerStrRule中的索引
+       */
+      HDSB_activitySelectStrDel: function (index) {
+        this.configSetting.activitySelectStrRule.splice(index, 1);
+      },
+      /**
        * 活动申报-删除价格规则
        */
       HDSB_activityPirceDelete: function (index, data) {
@@ -2232,13 +2320,25 @@
       },
 
       /**
-       * 活动申报-SKU过滤
-       * @description 通过设置的选项过滤SKU字符
+       * 活动申报-过滤
+       * @description 通过设置的选项过滤SKU/SKC字符
        * @param skustr
        * @returns
        */
-      HDSB_activityFilterSKU: function (skustr) {
+      HDSB_activityFilter: function (skustr) {
         return this.configSetting.activityFilerStrRule.some((val) =>
+          new RegExp(val.str, "i").test(skustr)
+        );
+      },
+
+      /**
+       * 活动申报-筛选
+       * @description 通过设置的选项筛选SKU/SKC字符
+       * @param skustr
+       * @returns
+       */
+      HDSB_activitySelect: function (skustr) {
+        return this.configSetting.activitySelectStrRule.some((val) =>
           new RegExp(val.str, "i").test(skustr)
         );
       },
