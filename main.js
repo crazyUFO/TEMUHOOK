@@ -6,6 +6,7 @@
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
 // @match        *://agentseller.temu.com/*
+// @match        *://*.temu.com/*
 // @homepageURL  https://www.baidu.com
 // @updateURL    https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
 // @downloadURL  https://raw.githubusercontent.com/crazyUFO/TEMUHOOK/refs/heads/main/dist/main.min.js
@@ -196,16 +197,69 @@
                             <div style="margin-top: 30px;">
                                 <el-button type="info" @click="HDSB_activityTargetActivityStockAdd" :disabled="configSetting.activityTargetActivityStock.length > 0">添加数量</el-button>
                             </div>
-
+                        </el-form>
+                        
+                    </el-tab-pane>
+                    <el-tab-pane label="广告投放" name="ADTF">
+                    <el-divider content-position="center">地区({{ADTF_currentSiteName}}) <el-button type="text" :disabled="configSetting.advertSites.length == 0" @click="dialogAdvertSiteVisible = true">更改</el-button></el-divider> 
+                    <el-divider>商品价格规则</el-divider>
+                        <el-form :model="configSetting" label-width="auto">
+                            <el-table :data="configSetting.advertPriceRule" style="width: 100%">
+                                <el-table-column label="最低价格(分)">
+                                    <template #default="scope">
+                                        <el-input-number v-model="scope.row.price" :min="0" :precision="0" :disabled="fetchState" controls-position="right" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="最高价格(分)">
+                                    <template #default="scope">
+                                        <el-input-number v-model="scope.row.maxPrice" :min="0" :precision="0" :disabled="fetchState" controls-position="right" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="" width="100">
+                                    <template #default="scope">
+                                        <el-button size="small" type="danger" @click="ADTF_advertPriceRuleDelete(scope.$index, scope.row)" :disabled="fetchState">
+                                        Delete
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <div style="margin-top: 30px;">
+                                <el-button type="info" @click="ADTF_advertPriceRuleAdd" :disabled="configSetting.advertPriceRule.length > 0">Add</el-button>
+                            </div>
+                        </el-form>
+                        <el-divider>预算&回报率</el-divider>
+                        <el-form :model="configSetting" label-width="auto">
+                            <el-table :data="configSetting.advertBudgetRule" style="width: 100%">
+                                <el-table-column label="预算金额(分)">
+                                    <template #default="scope">
+                                        <el-input-number v-model="scope.row.budget" :min="0" :precision="0" :disabled="fetchState" controls-position="right" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="回报率">
+                                    <template #default="scope">
+                                        <el-input-number  v-model="scope.row.roas" :min="0" :precision="2" :disabled="fetchState" controls-position="right" />
+                                    </template>
+                                </el-table-column>
+                                <el-table-column label="" width="100">
+                                    <template #default="scope">
+                                        <el-button size="small" type="danger" @click="ADTF_advertBudgetRuleDelete(scope.$index, scope.row)" :disabled="fetchState">
+                                        Delete
+                                        </el-button>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
+                            <div style="margin-top: 30px;">
+                                <el-button type="info" @click="ADTF_advertBudgetRuleAdd" :disabled="configSetting.advertBudgetRule.length > 0">Add</el-button>
+                            </div>
                         </el-form>
                     </el-tab-pane>
                 </el-tabs>
-                <div style="margin-top: 30px;" v-if="siteList.length">
-                  <el-divider content-position="left">选择站点 <el-button type="text" :disabled="siteList.length == 0" @click="showSelectSite">更改</el-button></el-divider>
+                <div style="margin-top: 30px;" v-if="siteList.length && currentTab!='ADTF'">
+                  <el-divider content-position="left">选择站点 <el-button type="text" :disabled="siteList.length == 0" @click="showSiteDialog">更改</el-button></el-divider>
                   <!--<template v-if="siteList.length"><el-tag size="small" v-for="val in configSetting.checkedSites" :key="val">{{siteLabel(val) }}</el-tag></template>-->
                   <el-tag size="small" v-if="configSetting.checkedSites" >{{siteLabel(configSetting.checkedSites) }}</el-tag>
                 </div>
-                <div style="margin-top: 30px;" v-if="malInfoList.length">
+                <div style="margin-top: 30px;" v-if="malInfoList.length && currentTab!='ADTF'">
                 <el-divider  content-position="left">选择店铺</el-divider> 
                 <el-radio-group v-model="configSetting.mallId">
                         <el-radio v-for="item in malInfoList" :key="item.mallId" :value="item.mallId" :disabled="fetchState">{{item.mallName}}</el-radio>
@@ -218,10 +272,9 @@
 
                 <div style="margin-top: 30px;" v-if="getUserInfoState && configSetting.mallId">
                   <el-button v-if="currentTab == 'SMZQ'" :loading="fetchState" type="primary" @click="handleClick('上新生命周期')">上新生命周期</el-button>
-
-<!--                       <el-button type="info" @click="handleClick('批量签署JIT规则')">批量签署JIT规则</el-button> -->
-
-                    <el-button v-if="currentTab == 'HDSB'" :loading="fetchState" type="primary" @click="handleClick('批量活动申报')">批量活动申报</el-button>
+                  <el-button v-if="currentTab == 'HDSB'" :loading="fetchState" type="primary" @click="handleClick('批量活动申报')">批量活动申报</el-button>
+                  <el-button v-if="currentTab == 'ADTF'" :loading="fetchState" type="primary" @click="handleClick('批量广告投放')">批量活动申报</el-button>
+                  <!-- <el-button type="info" @click="handleClick('批量签署JIT规则')">批量签署JIT规则</el-button> -->
                 </div>
 
             </el-drawer>
@@ -258,6 +311,15 @@
                         </ul>
                     </div>
                 </template>
+                <template v-if="clickState == '批量广告投放'">
+                    <div class="logBox" v-if="logList.length">
+                        <ul>
+                            <li v-for="item in logList">
+                                {{item.text}}
+                            </li>
+                        </ul>
+                    </div>
+                </template>
             </el-dialog>
 
             <el-dialog v-model="dialogSiteVisible" title="选择地区" destroy-on-close>
@@ -266,6 +328,12 @@
               </el-checkbox-group>-->
                 <el-radio-group v-model="configSetting.checkedSites" @change="dialogSiteVisible = false">
                   <el-radio v-for="val in siteList" :label="val.siteId" :key="val.siteId">{{val.siteName}}</el-radio>
+              </el-radio-group>
+            </el-dialog>
+
+            <el-dialog v-model="dialogAdvertSiteVisible" title="选择地区" destroy-on-close>
+                <el-radio-group v-model="configSetting.advertCurrentSiteId" @change="dialogAdvertSiteVisible = false">
+                  <el-radio v-for="val in configSetting.advertSites" :label="val.site_id" :key="val.site_id">{{val.site_name}}</el-radio>
               </el-radio-group>
             </el-dialog>
         </div>
@@ -281,6 +349,7 @@
         currentTab: "SMZQ",
         dialogLogVisible: false,
         dialogSiteVisible: false,
+        dialogAdvertSiteVisible: false,
         selectedActivity: "",
         siteList: [
           {
@@ -997,6 +1066,10 @@
             activityFilerStrRule: [],
             activitySelectStrRule: [],
             activityTargetActivityStock: [],
+            advertPriceRule: [],
+            advertBudgetRule: [],
+            advertSites: [],
+            advertCurrentSiteId: 0,
             token: null,
             checkedSites: null,
           },
@@ -1019,9 +1092,11 @@
     },
     mounted() {
       this.$nextTick(async () => {
+        this.ADTF_getSites()
         await this.getUserInfo();
         this.getSiteList();
         this.HDSB_getActivityList();
+
         const body = unsafeWindow.document.body;
         if (this.configSetting.blockPopUps) {
           body.classList.add("is-blockPopUps");
@@ -1030,6 +1105,77 @@
       });
     },
     methods: {
+      /**
+       * 获取广告投放的站点列表
+       * @param {Object} params - 请求参数
+       * @returns {Promise} Promise对象，resolve一个站点列表对象
+       */
+      ADTF_getSites: async function (params) {
+        const configSetting = this.configSetting;
+        // 定义请求的URL
+        const url =
+          "/api/v1/coconut/ad/query_mall_goods_list";
+        // 定义要发送的数据
+        const data = {
+          page_number: 1,
+          page_size: 1,
+          is_gray: false,
+          list_id: this.generateUUIDv4(),
+        };
+        // 使用fetch API发起POST请求
+        return fetch(url, {
+          method: "POST", // 指定请求方法为POST
+          headers: {
+            "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+            Cookie: configSetting.Cookie, // 添加Cookie标头
+          },
+          body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+        }).then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              const { site_info_list } = data.result;
+              configSetting.advertSites = site_info_list;
+            } else {
+              console.warn(`获取广告投放的站点失败: ${data.errorMsg}`);
+            }
+          })
+          .catch((error) => console.error("获取广告投放的站点失败:", error)); // 解析JSON响应
+      },
+
+      /**
+       * 获取广告投放的数据列表
+       * @param {Object} params - 请求参数
+       * @param {number} params.site_id - 站点ID，非必填
+       * @param {number} params.page_number - 页码，必填
+       * @param {string} params.list_id - 数据列表ID，必填
+       * @returns {Promise} Promise对象，resolve一个数据列表对象
+       */
+      ADTF_getDataList: function (params) {
+        const configSetting = this.configSetting;
+        const { site_id, page_size, page_number, list_id } = params;
+        // 定义请求的URL
+        const url =
+          "/api/v1/coconut/ad/query_mall_goods_list";
+        // 定义要发送的数据
+        const data = {
+          page_number: page_number,
+          page_size: page_size,
+          is_gray: false,
+          list_id: list_id,
+        };
+        if (site_id) {
+          data['selected_site_id'] = site_id
+        }
+        // 使用fetch API发起POST请求
+        return fetch(url, {
+          method: "POST", // 指定请求方法为POST
+          headers: {
+            "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+            Cookie: configSetting.Cookie, // 添加Cookie标头
+          },
+          body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+        }).then((response) => response.json())
+      },
       /**
        * 打开设置面板
        */
@@ -1379,6 +1525,7 @@
           maxPrice: 0,
         });
       },
+
 
       /**
        * 新生命周期-删除价格规则
@@ -1787,6 +1934,16 @@
         return productList;
       },
       /**
+       * 数据过滤
+       * @param {Object} data - 数据对象
+       * @returns {Promise} Promise对象，resolve一个过滤后的数据对象
+       */
+      ADTF_DataFilter: function (data) {
+        console.log(data);
+        let productList = [];
+        return productList;
+      },
+      /**
        * 批量活动申报
        */
       HDSB_execute: async function () {
@@ -2065,7 +2222,80 @@
             console.error("服务器返回数据失败: ", error); // 打印错误信息
           });
       },
-
+      /**
+       * ADT_execute: 批行广告投放
+       * @description
+       *     批行广告投放，根据配置信息，批量获取商品信息，等待指定时间后，
+       *     批行活动申报
+       * @returns {Promise<void>}  promise
+       */
+      ADTF_execute: async function () {
+        const configSetting = this.configSetting;
+        const waitSeconds = this.waitSeconds;
+        const _Vue = this;
+        _Vue.fetchState = true;
+        _Vue.logList = [];
+        let hasMore = true;
+        const list_id = this.generateUUIDv4();
+        let params = {
+          page_number: 1,
+          page_size: 100,
+          is_gray: false,
+          list_id: list_id,
+        };
+        if (configSetting.advertCurrentSiteId) { //假设有筛选地区的
+          params.site_id = configSetting.advertCurrentSiteId;
+        }
+        do {
+          let res = await this.ADTF_getDataList(params);
+          if (res.success) {
+            let dataList = res.result.goods_info_list;
+            hasMore = res.result.hasMore;
+            if (hasMore) {
+              params.page_number++;
+            }
+            _Vue.logList.push({
+              text: `服务器返回数据成功, 共${dataList.length}条数据`,
+            });
+            let productList = this.ADTF_DataFilter(dataList);
+            return false
+            if (productList.length) {
+              _Vue.logList.push({
+                text: `等待${configSetting.waitSeconds}秒后提交`,
+              });
+              await waitSeconds(configSetting.waitSeconds);
+              let result = await this.HDSB_submit(productList);
+              if (result.success) {
+                _Vue.logList.push({
+                  text: `活动申报成功,该页总归申报${productList.length}个`,
+                });
+              } else {
+                _Vue.logList.push({
+                  text: `活动申报失败`,
+                });
+                console.warn(`活动申报失败: ${data.errorMsg}`);
+              }
+            } else {
+              _Vue.logList.push({
+                text: `该页没有符合条件的数据`,
+              });
+            }
+          } else {
+            _Vue.logList.push({
+              text: `获取商品信息失败`,
+            });
+            console.warn(`获取商品信息失败: ${data.errorMsg}`);
+          }
+          _Vue.logList.push({
+            text: `等待${configSetting.waitSeconds}秒请求....`,
+          });
+          await waitSeconds(configSetting.waitSeconds);
+        } while (hasMore);
+        _Vue.fetchState = false;
+        _Vue.logList.push({
+          text: `全部处理完成`,
+        });
+      },
       /**
        * 商品列表-请求商品列表
        * @returns
@@ -2363,6 +2593,9 @@
         if (state == "批量活动申报") {
           this.HDSB_execute();
         }
+        if (state == "批量广告投放") {
+          this.ADTF_execute();
+        }
         this.clickState = state;
         this.dialogLogVisible = true;
       },
@@ -2384,6 +2617,102 @@
 
         return result;
       },
+      /**
+       * 生成一个符合RFC4122标准的UUID v4
+       *  @param {Object} options - 选项对象
+       *  @param {Object} options.random - 随数生成器，返回16字节的随机值
+       *  @param {Object} options.rng - 随数生成器，返回16字节的随机值
+       *  @param {Uint8Array} buffer - 缓冲区，用于存储生成的UUID
+       *  @param {number} offset - 缓冲区的偏移量
+       *  @returns {string} 生成的UUID v4 字符串
+       */
+      generateUUIDv4: function (options = {}, buffer, offset) {
+        // 初始化随机数生成器
+        const getRandomValues = (() => {
+          if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+            return crypto.getRandomValues.bind(crypto);
+          }
+          if (typeof msCrypto !== 'undefined' && typeof msCrypto.getRandomValues === 'function') {
+            return msCrypto.getRandomValues.bind(msCrypto);
+          }
+          throw new Error('不支持crypto.getRandomValues()，无法生成安全的随机UUID');
+        })();
+
+        // 创建16字节的缓冲区存储随机值
+        const rnds = options.random || (options.rng || (() => {
+          const arr = new Uint8Array(16);
+          getRandomValues(arr);
+          return arr;
+        }))();
+
+        // 设置UUID版本号为4 (0100)
+        rnds[6] = (rnds[6] & 0x0f) | 0x40;
+        // 设置UUID变体为RFC4122标准 (10xx)
+        rnds[8] = (rnds[8] & 0x3f) | 0x80;
+
+        // 如果提供了缓冲区，则将结果写入缓冲区
+        if (buffer) {
+          offset = offset || 0;
+          for (let i = 0; i < 16; i++) {
+            buffer[offset + i] = rnds[i];
+          }
+          return buffer;
+        }
+
+        // 十六进制字符映射表
+        const hexMap = [];
+        for (let i = 0; i < 256; i++) {
+          hexMap.push((i + 0x100).toString(16).substr(1));
+        }
+
+        // 将字节数组转换为UUID字符串格式
+        return [
+          hexMap[rnds[0]] + hexMap[rnds[1]] + hexMap[rnds[2]] + hexMap[rnds[3]],
+          hexMap[rnds[4]] + hexMap[rnds[5]],
+          hexMap[rnds[6]] + hexMap[rnds[7]],
+          hexMap[rnds[8]] + hexMap[rnds[9]],
+          hexMap[rnds[10]] + hexMap[rnds[11]] + hexMap[rnds[12]] + hexMap[rnds[13]] + hexMap[rnds[14]] + hexMap[rnds[15]]
+        ].join('-');
+      },
+      /**
+       * 添加广告投放价格规则
+       * @memberof ADTF
+       * @instance
+       */
+      ADTF_advertPriceRuleAdd: function () {
+        this.configSetting.advertPriceRule.push({
+          price: 0,
+          maxPrice: 0,
+        });
+      },
+      /**
+       * 删除广告投放价格规则
+       * @memberof ADTF
+       * @instance
+       */
+      ADTF_advertPriceRuleDelete: function (index) {
+        this.configSetting.advertPriceRule.splice(index, 1);
+      },
+
+      /**
+       * 添加广告预算规则
+       * @memberof ADTF
+       * @instance
+       */
+      ADTF_advertBudgetRuleAdd: function () {
+        this.configSetting.advertBudgetRule.push({
+          budget: 0,
+          roas: 0,
+        });
+      },
+      /**
+       * 删除广告预算规则
+       * @memberof ADTF
+       * @instance
+       */
+      ADTF_advertBudgetRuleDelete: function (index) {
+        this.configSetting.advertBudgetRule.splice(index, 1);
+      },
     },
     watch: {
       configSetting: {
@@ -2397,6 +2726,11 @@
         // 开启深度监听
         deep: true,
       },
+    },
+    computed: {
+      ADTF_currentSiteName() {
+        return this.configSetting.advertCurrentSiteId && this.configSetting.advertSites.length > 0 ? this.configSetting.advertSites.find((item) => item.site_id === this.configSetting.advertCurrentSiteId).site_name : '全部';
+      }
     },
   };
   const app = Vue.createApp(App);
