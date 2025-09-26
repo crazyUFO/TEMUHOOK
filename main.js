@@ -201,7 +201,7 @@
                         
                     </el-tab-pane>
                     <el-tab-pane label="广告投放" name="ADTF">
-                    <el-divider content-position="center">地区({{ADTF_currentSiteName}}) <el-button type="text" :disabled="configSetting.advertSites.length == 0" @click="dialogAdvertSiteVisible = true">更改</el-button></el-divider> 
+                    <el-divider content-position="center">地区({{ADTF_currentSiteName}}) <el-button type="text" :disabled="advertSites.length == 0" @click="dialogAdvertSiteVisible = true">更改</el-button></el-divider> 
                     <el-divider>商品价格规则</el-divider>
                         <el-form :model="configSetting" label-width="auto">
                             <el-table :data="configSetting.advertPriceRule" style="width: 100%">
@@ -270,10 +270,10 @@
                 <div> -->
 
 
-                <div style="margin-top: 30px;" v-if="getUserInfoState && configSetting.mallId">
-                  <el-button v-if="currentTab == 'SMZQ'" :loading="fetchState" type="primary" @click="handleClick('上新生命周期')">上新生命周期</el-button>
-                  <el-button v-if="currentTab == 'HDSB'" :loading="fetchState" type="primary" @click="handleClick('批量活动申报')">批量活动申报</el-button>
-                  <el-button v-if="currentTab == 'ADTF'" :loading="fetchState" type="primary" @click="handleClick('批量广告投放')">批量活动申报</el-button>
+                <div style="margin-top: 30px;">
+                  <el-button v-if="currentTab == 'SMZQ' && getUserInfoState && configSetting.mallId" :loading="fetchState" type="primary" @click="handleClick('上新生命周期')">上新生命周期</el-button>
+                  <el-button v-else-if="currentTab == 'HDSB' && getUserInfoState && configSetting.mallId" :loading="fetchState" type="primary" @click="handleClick('批量活动申报')">批量活动申报</el-button>
+                  <el-button v-else-if="currentTab == 'ADTF'" :loading="fetchState" type="primary" @click="handleClick('批量广告投放')">批量活动申报</el-button>
                   <!-- <el-button type="info" @click="handleClick('批量签署JIT规则')">批量签署JIT规则</el-button> -->
                 </div>
 
@@ -332,8 +332,8 @@
             </el-dialog>
 
             <el-dialog v-model="dialogAdvertSiteVisible" title="选择地区" destroy-on-close>
-                <el-radio-group v-model="configSetting.advertCurrentSiteId" @change="dialogAdvertSiteVisible = false">
-                  <el-radio v-for="val in configSetting.advertSites" :label="val.site_id" :key="val.site_id">{{val.site_name}}</el-radio>
+                <el-radio-group v-model="advertCurrentSiteId" @change="dialogAdvertSiteVisible = false">
+                  <el-radio v-for="val in advertSites" :label="val.site_id" :key="val.site_id">{{val.site_name}}</el-radio>
               </el-radio-group>
             </el-dialog>
         </div>
@@ -351,6 +351,8 @@
         dialogSiteVisible: false,
         dialogAdvertSiteVisible: false,
         selectedActivity: "",
+        advertSites: [],
+        advertCurrentSiteId: 0,
         siteList: [
           {
             siteId: 100,
@@ -1068,8 +1070,6 @@
             activityTargetActivityStock: [],
             advertPriceRule: [],
             advertBudgetRule: [],
-            advertSites: [],
-            advertCurrentSiteId: 0,
             token: null,
             checkedSites: null,
           },
@@ -1134,7 +1134,7 @@
           .then((data) => {
             if (data.success) {
               const { site_info_list } = data.result;
-              configSetting.advertSites = site_info_list;
+              this.advertSites = site_info_list;
             } else {
               console.warn(`获取广告投放的站点失败: ${data.errorMsg}`);
             }
@@ -1338,6 +1338,23 @@
             "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
             Cookie: configSetting.Cookie, // 添加Cookie标头
             mallid: configSetting.mallId, // 添加mallid标头
+          },
+          body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
+        }).then((response) => response.json()); // 解析JSON响应
+      },
+      ADTF_submit: async function (productList) {
+        const configSetting = this.configSetting;
+        const url =
+          "/api/v1/coconut/ad/create_ads/create";
+        const data = {
+          create_ad_reqs: productList,
+        };
+        // 使用fetch API发起POST请求
+        return fetch(url, {
+          method: "POST", // 指定请求方法为POST
+          headers: {
+            "Content-Type": "application/json", // 设置请求头，告诉服务器发送的是JSON数据
+            Cookie: configSetting.Cookie, // 添加Cookie标头
           },
           body: JSON.stringify(data), // 将JavaScript对象转换为JSON字符串
         }).then((response) => response.json()); // 解析JSON响应
@@ -1939,9 +1956,37 @@
        * @returns {Promise} Promise对象，resolve一个过滤后的数据对象
        */
       ADTF_DataFilter: function (data) {
-        console.log(data);
-        let productList = [];
-        return productList;
+        const configSetting = this.configSetting;
+        const price = configSetting.advertPriceRule[0].price;
+        const maxPirce = configSetting.advertPriceRule[0].maxPirce;
+        const budget = configSetting.advertBudgetRule[0].budget;
+        const roas = configSetting.advertBudgetRule[0].roas;
+        data = data.map((value) => {
+          return {
+            ...value,
+            priceMin: value.supply_price_min.replace(/￥/g, "") * 100,
+            priceMax: value.supply_price_max.replace(/￥/g, "") * 100
+          }
+        })
+        let productList = data.filter((value) => {
+          if (price && maxPirce) {
+            return value.priceMin == price && value.priceMax == maxPirce
+          } else if (price) {
+            return value.priceMin == price
+          } else if (maxPirce) {
+            return value.priceMax == maxPirce
+          }
+        });
+        //筛选出可提交的数据
+        let submitData = productList.map((value) => {
+          return {
+            budget: budget,
+            goods_id: value.goods_id,
+            roas: roas * 10000,
+            site_id: value.site_list[0]
+          }
+        })
+        return submitData;
       },
       /**
        * 批量活动申报
@@ -2233,6 +2278,7 @@
         const configSetting = this.configSetting;
         const waitSeconds = this.waitSeconds;
         const _Vue = this;
+        const advertCurrentSiteId = this.advertCurrentSiteId
         _Vue.fetchState = true;
         _Vue.logList = [];
         let hasMore = true;
@@ -2243,8 +2289,8 @@
           is_gray: false,
           list_id: list_id,
         };
-        if (configSetting.advertCurrentSiteId) { //假设有筛选地区的
-          params.site_id = configSetting.advertCurrentSiteId;
+        if (advertCurrentSiteId) { //假设有筛选地区的
+          params.site_id = advertCurrentSiteId;
         }
         do {
           let res = await this.ADTF_getDataList(params);
@@ -2255,19 +2301,21 @@
               params.page_number++;
             }
             _Vue.logList.push({
-              text: `服务器返回数据成功, 共${dataList.length}条数据`,
+              text: `服务器返回数据成功, 第${params.page_number}页，共${dataList.length}条数据`,
             });
             let productList = this.ADTF_DataFilter(dataList);
-            return false
             if (productList.length) {
+              _Vue.logList.push({
+                text: `第${params.page_number}页，筛选出${productList.length}条数据`,
+              });
               _Vue.logList.push({
                 text: `等待${configSetting.waitSeconds}秒后提交`,
               });
               await waitSeconds(configSetting.waitSeconds);
-              let result = await this.HDSB_submit(productList);
+              let result = await this.ADTF_submit(productList);
               if (result.success) {
                 _Vue.logList.push({
-                  text: `活动申报成功,该页总归申报${productList.length}个`,
+                  text: `广告投放成功,该页总归申报${productList.length}个`,
                 });
               } else {
                 _Vue.logList.push({
@@ -2729,7 +2777,7 @@
     },
     computed: {
       ADTF_currentSiteName() {
-        return this.configSetting.advertCurrentSiteId && this.configSetting.advertSites.length > 0 ? this.configSetting.advertSites.find((item) => item.site_id === this.configSetting.advertCurrentSiteId).site_name : '全部';
+        return this.advertCurrentSiteId && this.advertSites.length > 0 ? this.advertSites.find((item) => item.site_id === this.advertCurrentSiteId).site_name : '全部';
       }
     },
   };
