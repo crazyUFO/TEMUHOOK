@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      3.2
+// @version      3.3
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -2285,7 +2285,7 @@
         const list_id = this.generateUUIDv4();
         let params = {
           page_number: 1,
-          page_size: 100,
+          page_size: 50,
           is_gray: false,
           list_id: list_id,
         };
@@ -2296,7 +2296,7 @@
           let res = await this.ADTF_getDataList(params);
           if (res.success) {
             let dataList = res.result.goods_info_list;
-            hasMore = res.result.hasMore;
+            hasMore = res.has_more
             if (hasMore) {
               params.page_number++;
             }
@@ -2304,6 +2304,8 @@
               text: `服务器返回数据成功, 第${params.page_number}页，共${dataList.length}条数据`,
             });
             let productList = this.ADTF_DataFilter(dataList);
+            console.log(productList)
+
             if (productList.length) {
               _Vue.logList.push({
                 text: `第${params.page_number}页，筛选出${productList.length}条数据`,
@@ -2319,9 +2321,9 @@
                 });
               } else {
                 _Vue.logList.push({
-                  text: `活动申报失败`,
+                  text: `广告投放失败`,
                 });
-                console.warn(`活动申报失败: ${data.errorMsg}`);
+                console.warn(`广告投放失败: ${result.error_msg}`);
               }
             } else {
               _Vue.logList.push({
@@ -2332,12 +2334,13 @@
             _Vue.logList.push({
               text: `获取商品信息失败`,
             });
-            console.warn(`获取商品信息失败: ${data.errorMsg}`);
+            console.warn(`获取商品信息失败: ${res.error_msg}`);
           }
           _Vue.logList.push({
             text: `等待${configSetting.waitSeconds}秒请求....`,
           });
           await waitSeconds(configSetting.waitSeconds);
+          console.log(hasMore)
         } while (hasMore);
         _Vue.fetchState = false;
         _Vue.logList.push({
