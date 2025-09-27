@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      3.3
+// @version      3.4
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -255,7 +255,7 @@
                     </el-tab-pane>
                 </el-tabs>
                 <div style="margin-top: 30px;" v-if="siteList.length && currentTab!='ADTF'">
-                  <el-divider content-position="left">选择站点 <el-button type="text" :disabled="siteList.length == 0" @click="showSiteDialog">更改</el-button></el-divider>
+                  <el-divider content-position="left">选择站点 <el-button type="text" :disabled="siteList.length == 0" @click="showSelectSite">更改</el-button></el-divider>
                   <!--<template v-if="siteList.length"><el-tag size="small" v-for="val in configSetting.checkedSites" :key="val">{{siteLabel(val) }}</el-tag></template>-->
                   <el-tag size="small" v-if="configSetting.checkedSites" >{{siteLabel(configSetting.checkedSites) }}</el-tag>
                 </div>
