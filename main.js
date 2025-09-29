@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TEMUHOOK
 // @namespace    SAN
-// @version      3.4
+// @version      3.5
 // @description  TEMUHOOK 提交
 // @author       XIAOSAN
 // @match        *://seller.kuajingmaihuo.com/*
@@ -1968,13 +1968,23 @@
             priceMax: value.supply_price_max.replace(/￥/g, "") * 100
           }
         })
+        // let productList = data.filter((value) => {
+        //   if (price && maxPirce) {
+        //     return value.priceMin == price && value.priceMax == maxPirce
+        //   } else if (price) {
+        //     return value.priceMin == price
+        //   } else if (maxPirce) {
+        //     return value.priceMax == maxPirce
+        //   }
+        // });
+        //按照产品最小价格匹配出范围价格
         let productList = data.filter((value) => {
           if (price && maxPirce) {
-            return value.priceMin == price && value.priceMax == maxPirce
+            return value.priceMin >= price && value.priceMin <= maxPirce
           } else if (price) {
-            return value.priceMin == price
+            return value.priceMin >= price
           } else if (maxPirce) {
-            return value.priceMax == maxPirce
+            return value.priceMin <= maxPirce
           }
         });
         //筛选出可提交的数据
